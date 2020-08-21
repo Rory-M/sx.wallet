@@ -57,7 +57,7 @@ void walletSx::sub_balance( const name account, const name contract, const asset
     check( balance.amount >= quantity.amount, "overdrawn balance" );
 
     // reduce balance
-    _balances.modify( itr, account, [&]( auto& row ) {
+    _balances.modify( itr, same_payer, [&]( auto& row ) {
         row.balances[ symcode ] -= quantity;
     });
 }

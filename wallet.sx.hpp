@@ -14,12 +14,18 @@ public:
     /**
      * ## TABLE `balances`
      *
-     * **Scope:** `contract`
+     * **scope:** `contract`
      *
      * - `{name} account` - account name
-     * - `{map<uint64_t, extended_asset>} balances` - balances
+     * - `{map<symbol_code, asset>} balances` - balances
      *
-     * ### example
+     * ### Example - cleos
+     *
+     * ```bash
+     * $ cleos get table wallet.sx eosio.token balances --lower myaccount --upper myaccount
+     * ```
+     *
+     * ### Example - json
      *
      * ```json
      * {
@@ -43,7 +49,7 @@ public:
      *
      * Request to withdraw quantity
      *
-     * - **authority**: `account` or `self`
+     * - **authority**: `account` or `get_self()`
      *
      * ### params
      *
@@ -66,13 +72,49 @@ public:
      * const asset quantity = asset{ 10000, symbol{"EOS", 4} };
      *
      * // send transaction
-     * wallet::withdraw_action withdraw( "wallet.sx"_n, { account, "active"_n });
+     * walletSx::withdraw_action withdraw( "wallet.sx"_n, { account, "active"_n });
      * withdraw.send( account, contract, quantity );
      * ```
      */
     [[eosio::action]]
     void withdraw( const name account, const name contract, const asset quantity );
 
+    /**
+     * ## ACTION `transfer`
+     *
+     * Transfer assets to an account
+     *
+     * - **authority**: `from` or `get_self()`
+     *
+     * ### params
+     *
+     * - `{name} from` - authorized sender account
+     * - `{name} to` - receiver account
+     * - `{name} contract` - token contract (ex: "eosio.token")
+     * - `{asset} quantity` - transfer quantity amount (ex: "1.0000 EOS")
+     * - `{string} [memo=""]` - memo used on transfer
+     *
+     * ### Example - cleos
+     *
+     * ```bash
+     * cleos push action wallet.sx transfer '["myaccount", "toaccount", "eosio.token", "1.0000 EOS", "memo"]' -p myaccount
+     * ```
+     *
+     * ### Example - smart contract
+     *
+     * ```c++
+     * // input variables
+     * const name from = "myaccount"_n;
+     * const name to = "toaccount"_n;
+     * const name contract = "eosio.token"_n;
+     * const asset quantity = asset{ 10000, symbol{"EOS", 4} };
+     * const string memo = "my memo";
+     *
+     * // send transaction
+     * walletSx::transfer_action transfer( "wallet.sx"_n, { from, "active"_n });
+     * transfer.send( from, to, contract, quantity, memo );
+     * ```
+     */
     [[eosio::action]]
     void transfer( const name from, const name to, const name contract, const asset quantity, const optional<string> memo );
 
