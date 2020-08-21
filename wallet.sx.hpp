@@ -123,6 +123,5 @@ public:
 private:
     void add_balance( const name account, const name contract, const asset quantity, const name ram_payer );
     void sub_balance( const name account, const name contract, const asset quantity );
-    // void check_open( const name contract, const name account, const symbol_code symcode );
-    // void save_balance( const name account, const vector<extended_symbol> symcodes );
+    void check_open( const name account, const name contract, const symbol_code symcode );
 };

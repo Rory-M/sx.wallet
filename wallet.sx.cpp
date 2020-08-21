@@ -21,15 +21,7 @@ void walletSx::on_transfer( const name from, const name to, const asset quantity
 [[eosio::action]]
 void walletSx::withdraw( const name account, const name contract, const asset quantity )
 {
-    // authority `account` or contract itself
-    if ( !has_auth( get_self() ) ) require_auth( account );
-
-    // deduct balance from internal balances
-    sub_balance( account, contract, quantity );
-
-    // return tokens to account
-    token::transfer_action transfer( contract, { get_self(), "active"_n });
-    transfer.send( get_self(), account, quantity, "withdraw" );
+    walletSx::transfer( account, account, contract, quantity, "withdraw" );
 }
 
 [[eosio::action]]
@@ -40,6 +32,7 @@ void walletSx::transfer( const name from, const name to, const name contract, co
 
     // deduct balance from internal balances
     sub_balance( from, contract, quantity );
+    check_open( to, contract, quantity.symbol.code() );
 
     // return tokens to account
     token::transfer_action transfer( contract, { get_self(), "active"_n });
@@ -88,4 +81,11 @@ void walletSx::add_balance( const name account, const name contract, const asset
             else row.balances[ symcode ] += quantity;
         });
     }
+}
+
+void walletSx::check_open( const name account, const name contract, const symbol_code symcode )
+{
+    token::accounts _accounts( contract, account.value );
+    auto itr = _accounts.find( symcode.raw() );
+    check( itr != _accounts.end(), account.to_string() + " account must have " + symcode.to_string() + " `open` balance" );
 }
