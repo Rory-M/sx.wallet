@@ -1,2 +1,5 @@
 *.abi
 *.wasm
+.vscode
+stderr
+nodeos
