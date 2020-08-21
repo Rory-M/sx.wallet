@@ -40,7 +40,4 @@ public:
 		const asset balance = walletSx::get_balance("wallet.sx"_n, account, contract, symcode );
 		print( balance.to_string() );
 	}
-
-
-
 };

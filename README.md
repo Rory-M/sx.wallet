@@ -1,21 +1,20 @@
 # SX `Wallet` 🏦 - EOSIO Smart Contract
 
-> Deposit/withdraw funds to SX contracts
+Deposit/withdraw assets from SX wallet contract
 
-## Table of Content
-
-- [Examples](#examples)
-- [TABLE `balances`](#table-balances)
-- [ACTION `withdraw`](#action-withdraw)
-- [ACTION `transfer`](#action-transfer)
-- [STATIC `get_balance`](#static-get_balance)
-
-## Examples
+## Quickstart
 
 ```bash
 cleos transfer myaccount wallet.sx "1.0000 EOS" "myaccount"
 cleos push action wallet.sx withdraw '["myaccount", "eosio.token", "1.0000 EOS"]' -p myaccount
 ```
+
+## Table of Content
+
+- [TABLE `balances`](#table-balances)
+- [ACTION `withdraw`](#action-withdraw)
+- [ACTION `transfer`](#action-transfer)
+- [STATIC `get_balance`](#static-get_balance)
 
 ## TABLE `balances`
 
