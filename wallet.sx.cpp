@@ -34,8 +34,7 @@ void walletSx::withdraw( const name account, const name contract, const asset qu
 [[eosio::action]]
 void walletSx::transfer( const name from, const name to, const name contract, const asset quantity, const optional<string> memo )
 {
-    // authority `from` or contract itself
-    if ( !has_auth( get_self() ) ) require_auth( from );
+    require_auth_or_self( from );
 
     // deduct balance from internal balances
     sub_balance( from, contract, quantity );
@@ -50,6 +49,60 @@ void walletSx::transfer( const name from, const name to, const name contract, co
 void walletSx::deposit( const name account, const name contract, const asset quantity )
 {
     require_auth( get_self() );
+}
+
+[[eosio::action]]
+void walletSx::open( const name account, const name contract, const symbol_code symcode, const name ram_payer )
+{
+    require_auth( ram_payer );
+
+    check( is_account( account ), "account does not exist" );
+
+    // retrieve token precision directly from token contract
+    const asset supply = token::get_supply( contract, symcode );
+    walletSx::balances _balances( get_self(), account.value );
+    const auto itr = _balances.find( contract.value );
+
+    // create new balance entry
+    if ( itr == _balances.end() ) {
+        _balances.emplace( ram_payer, [&]( auto& row ) {
+            row.contract = contract;
+            row.balances[ symcode ] = asset{0, supply.symbol};
+        });
+    } else {
+        // balance does not exists
+        if ( itr->balances.find( symcode ) == itr->balances.end() ) {
+            _balances.modify( itr, same_payer, [&]( auto& row ) {
+                row.balances[ symcode ] = asset{0, supply.symbol};
+            });
+        }
+    }
+}
+
+[[eosio::action]]
+void walletSx::close( const name account, const name contract, const symbol_code symcode )
+{
+    require_auth_or_self( account );
+
+    walletSx::balances _balances( get_self(), account.value );
+    const auto & itr = _balances.get( contract.value, "no account to close" );
+
+    // account exists but no balances exists
+    if ( itr.balances.size() == 0 ) return _balances.erase( itr );
+
+    // symbol exists in balances
+    if ( itr.balances.find( symcode ) != itr.balances.end() ) {
+        const asset balance = itr.balances.at( symcode );
+        check( balance.amount == 0, symcode.to_string() + " balance must equal to 0");
+
+        // only single balance exists, delete entire account table row
+        if ( itr.balances.size() == 1 ) return _balances.erase( itr );
+
+        // delete single balance
+        _balances.modify( itr, same_payer, [&]( auto& row ) {
+            row.balances.erase( symcode );
+        });
+    }
 }
 
 void walletSx::sub_balance( const name account, const name contract, const asset quantity )
@@ -109,4 +162,10 @@ void walletSx::check_open_internal( const name account, const name contract, con
     check( itr != _balances.end(), message );
     const asset balance = itr->balances.at( symcode );
     check( balance.symbol.code().raw(), message );
+}
+
+void walletSx::require_auth_or_self( const name account )
+{
+    if ( has_auth( get_self() ) ) return;
+    require_auth( account );
 }

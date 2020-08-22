@@ -119,6 +119,12 @@ public:
     void transfer( const name from, const name to, const name contract, const asset quantity, const optional<string> memo );
 
     [[eosio::action]]
+    void open( const name account, const name contract, const symbol_code symcode, const name ram_payer );
+
+    [[eosio::action]]
+    void close( const name account, const name contract, const symbol_code symcode );
+
+    [[eosio::action]]
     void deposit( const name account, const name contract, const asset quantity );
 
     [[eosio::on_notify("*::transfer")]]
@@ -161,10 +167,13 @@ public:
     using withdraw_action = eosio::action_wrapper<"withdraw"_n, &walletSx::withdraw>;
     using transfer_action = eosio::action_wrapper<"transfer"_n, &walletSx::transfer>;
     using deposit_action = eosio::action_wrapper<"deposit"_n, &walletSx::deposit>;
+    using open_action = eosio::action_wrapper<"open"_n, &walletSx::open>;
+    using close_action = eosio::action_wrapper<"close"_n, &walletSx::close>;
 
 private:
     void add_balance( const name account, const name contract, const asset quantity, const name ram_payer );
     void sub_balance( const name account, const name contract, const asset quantity );
     void check_open( const name account, const name contract, const symbol_code symcode );
     void check_open_internal( const name account, const name contract, const symbol_code symcode );
+    void require_auth_or_self( const name account );
 };
