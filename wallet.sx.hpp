@@ -166,4 +166,5 @@ private:
     void add_balance( const name account, const name contract, const asset quantity, const name ram_payer );
     void sub_balance( const name account, const name contract, const asset quantity );
     void check_open( const name account, const name contract, const symbol_code symcode );
+    void check_open_internal( const name account, const name contract, const symbol_code symcode );
 };

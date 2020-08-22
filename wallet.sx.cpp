@@ -9,13 +9,20 @@ void walletSx::on_transfer( const name from, const name to, const asset quantity
     // ignore no-incoming transfers
     if ( to != get_self() ) return;
 
-    // add balance from sender
+    // allows to deposit to another account
+    // default (no memo) deposits goes to sender (from)
+    const name account = memo.length() ? name{memo} : from;
     const name contract = get_first_receiver();
-    add_balance( from, contract, quantity, get_self() );
+
+    // for alternate account deposits, account must already have open balance
+    if ( account != from ) check_open_internal( account, contract, quantity.symbol.code() );
+
+    // update balance
+    add_balance( account, contract, quantity, get_self() );
 
     // deposit log (notification purposes only)
     walletSx::deposit_action deposit( get_self(), { get_self(), "active"_n });
-    deposit.send( from, contract, quantity );
+    deposit.send( account, contract, quantity );
 }
 
 [[eosio::action]]
@@ -66,7 +73,7 @@ void walletSx::add_balance( const name account, const name contract, const asset
 {
     walletSx::balances _balances( get_self(), account.value );
     const symbol_code symcode = quantity.symbol.code();
-    const auto itr = _balances.find( contract.value);
+    const auto itr = _balances.find( contract.value );
 
     // create new balance entry
     if ( itr == _balances.end() ) {
@@ -85,7 +92,21 @@ void walletSx::add_balance( const name account, const name contract, const asset
 
 void walletSx::check_open( const name account, const name contract, const symbol_code symcode )
 {
+    check( is_account( account ), account.to_string() + " account does not exist");
+
     token::accounts _accounts( contract, account.value );
     auto itr = _accounts.find( symcode.raw() );
     check( itr != _accounts.end(), account.to_string() + " account must have " + symcode.to_string() + " `open` balance" );
+}
+
+void walletSx::check_open_internal( const name account, const name contract, const symbol_code symcode )
+{
+    check( is_account( account ), account.to_string() + " account does not exist");
+
+    walletSx::balances _balances( get_self(), account.value );
+    const string message = account.to_string() + " account must have " + symcode.to_string() + " `open` balance in " + get_self().to_string();
+    const auto itr = _balances.find( contract.value );
+    check( itr != _balances.end(), message );
+    const asset balance = itr->balances.at( symcode );
+    check( balance.symbol.code().raw(), message );
 }

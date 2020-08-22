@@ -5,8 +5,17 @@ Deposit/withdraw assets from SX wallet contract
 ## Quickstart
 
 ```bash
-cleos transfer myaccount wallet.sx "1.0000 EOS" "myaccount"
+# default deposit
+cleos transfer myaccount wallet.sx "1.0000 EOS"
+
+# deposit to specific account
+cleos transfer myaccount wallet.sx "1.0000 EOS" "toaccount"
+
+# withdraw
 cleos push action wallet.sx withdraw '["myaccount", "eosio.token", "1.0000 EOS"]' -p myaccount
+
+# transer
+cleos push action wallet.sx transfer '["myaccount", "toaccount", "eosio.token", "1.0000 EOS", "my memo"]' -p myaccount
 ```
 
 ## Table of Content

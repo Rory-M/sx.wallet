@@ -17,7 +17,7 @@ public:
 	void deposit( const name account, const name contract, const asset quantity )
 	{
 		token::transfer_action transfer( contract, { account, "active"_n });
-	    transfer.send( account, "wallet.sx"_n, quantity, "deposit" );
+	    transfer.send( account, "wallet.sx"_n, quantity, "" );
 	}
 
 	[[eosio::action]]
