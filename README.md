@@ -18,22 +18,22 @@ cleos push action wallet.sx withdraw '["myaccount", "eosio.token", "1.0000 EOS"]
 
 ## TABLE `balances`
 
-**scope:** `contract`
+**scope:** `account`
 
-- `{name} account` - account name
+- `{name} contract` - token contract
 - `{map<symbol_code, asset>} balances` - balances
 
 ### Example - cleos
 
 ```bash
-$ cleos get table wallet.sx eosio.token balances --lower myaccount --upper myaccount
+$ cleos get table wallet.sx myaccount balances
 ```
 
 ### Example - json
 
 ```json
 {
-    "account": "myaccount",
+    "contract": "eosio.token",
     "balances": [
         { "key": "EOS", "value": "1.0000 EOS" }
     ]

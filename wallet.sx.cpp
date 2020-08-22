@@ -47,9 +47,9 @@ void walletSx::deposit( const name account, const name contract, const asset qua
 
 void walletSx::sub_balance( const name account, const name contract, const asset quantity )
 {
-    walletSx::balances _balances( get_self(), contract.value );
+    walletSx::balances _balances( get_self(), account.value );
     const symbol_code symcode = quantity.symbol.code();
-    const auto & itr = _balances.get( account.value, "no account balance found" );
+    const auto & itr = _balances.get( contract.value, "no account balance found" );
     const asset balance = itr.balances.at( symcode );
 
     // validation
@@ -64,14 +64,14 @@ void walletSx::sub_balance( const name account, const name contract, const asset
 
 void walletSx::add_balance( const name account, const name contract, const asset quantity, const name ram_payer )
 {
-    walletSx::balances _balances( get_self(), contract.value );
+    walletSx::balances _balances( get_self(), account.value );
     const symbol_code symcode = quantity.symbol.code();
-    const auto itr = _balances.find( account.value);
+    const auto itr = _balances.find( contract.value);
 
     // create new balance entry
     if ( itr == _balances.end() ) {
         _balances.emplace( ram_payer, [&]( auto& row ) {
-            row.account = account;
+            row.contract = contract;
             row.balances[ symcode ] = quantity;
         });
     // modify balance entry

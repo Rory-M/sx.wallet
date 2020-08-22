@@ -23,15 +23,22 @@ public:
 	[[eosio::action]]
 	void withdraw( const name account, const name contract, const asset quantity )
 	{
-		walletSx::withdraw_action withdraw( "wallet.sx", { account, "active"_n });
+		walletSx::withdraw_action withdraw( "wallet.sx"_n, { account, "active"_n });
 	    withdraw.send( account, contract, quantity );
 	}
 
 	[[eosio::action]]
 	void transfer( const name from, const name to, const name contract, const asset quantity, const string memo )
 	{
-		walletSx::transfer_action transfer( "wallet.sx", { from, "active"_n });
+		walletSx::transfer_action transfer( "wallet.sx"_n, { from, "active"_n });
 	    transfer.send( from, to, contract, quantity, memo );
+	}
+
+	[[eosio::action]]
+	void internal( const name from, const name contract, const asset quantity )
+	{
+		walletSx::transfer_action transfer( "wallet.sx"_n, { "wallet.sx"_n, "active"_n });
+	    transfer.send( from, get_self(), contract, quantity, "internal transfer" );
 	}
 
 	[[eosio::action]]

@@ -14,22 +14,22 @@ public:
     /**
      * ## TABLE `balances`
      *
-     * **scope:** `contract`
+     * **scope:** `account`
      *
-     * - `{name} account` - account name
+     * - `{name} contract` - token contract
      * - `{map<symbol_code, asset>} balances` - balances
      *
      * ### Example - cleos
      *
      * ```bash
-     * $ cleos get table wallet.sx eosio.token balances --lower myaccount --upper myaccount
+     * $ cleos get table wallet.sx myaccount balances
      * ```
      *
      * ### Example - json
      *
      * ```json
      * {
-     *     "account": "myaccount",
+     *     "contract": "eosio.token",
      *     "balances": [
      *         { "key": "EOS", "value": "1.0000 EOS" }
      *     ]
@@ -37,10 +37,10 @@ public:
      * ```
      */
     struct [[eosio::table("balances")]] balances_row {
-        name                            account;
+        name                            contract;
         map<symbol_code, asset>         balances;
 
-        uint64_t primary_key() const { return account.value; }
+        uint64_t primary_key() const { return contract.value; }
     };
     typedef eosio::multi_index< "balances"_n, balances_row > balances;
 
@@ -149,8 +149,8 @@ public:
      */
     static asset get_balance( const name code, const name account, const name contract, const symbol_code symcode )
     {
-        walletSx::balances _balances( code, contract.value );
-        const auto balances = _balances.get( account.value, "no account balance found" ).balances;
+        walletSx::balances _balances( code, account.value );
+        const auto balances = _balances.get( contract.value, "no account balance found" ).balances;
         const asset balance = balances.at( symcode );
         check( balance.symbol.code().raw(), "no balance found" );
 

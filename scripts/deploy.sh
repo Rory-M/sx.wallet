@@ -16,6 +16,7 @@ cleos set contract basic . basic.wasm basic.abi
 
 # permission
 cleos set account permission wallet.sx active --add-code
+cleos set account permission wallet.sx active basic --add-code
 cleos set account permission basic active --add-code
 
 # create EOS token
