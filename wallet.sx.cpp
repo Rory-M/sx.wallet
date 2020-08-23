@@ -149,7 +149,7 @@ void walletSx::check_open( const name account, const name contract, const symbol
 
     token::accounts _accounts( contract, account.value );
     auto itr = _accounts.find( symcode.raw() );
-    check( itr != _accounts.end(), account.to_string() + " account must have " + symcode.to_string() + " `open` balance" );
+    check( itr != _accounts.end(), account.to_string() + " account must have " + symcode.to_string() + " `open` balance in " + contract.to_string());
 }
 
 void walletSx::check_open_internal( const name account, const name contract, const symbol_code symcode )

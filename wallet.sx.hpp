@@ -118,9 +118,71 @@ public:
     [[eosio::action]]
     void transfer( const name from, const name to, const name contract, const asset quantity, const optional<string> memo );
 
+    /**
+     * ## ACTION `open`
+     *
+     * Open contract & symbol balance for account
+     *
+     * - **authority**: `ram_payer`
+     *
+     * ### params
+     *
+     * - `{name} account` - account to open balance
+     * - `{name} contract` - token contract (ex: "eosio.token")
+     * - `{symbol_code} symcode` - symcode code (ex: "EOS")
+     * - `{name} ram_payer` - authorized account to pay for RAM
+     *
+     * ### Example - cleos
+     *
+     * ```bash
+     * cleos push action wallet.sx open '["myaccount", "eosio.token", "EOS", "myaccount"]' -p myaccount
+     * ```
+     *
+     * ### Example - smart contract
+     *
+     * ```c++
+     * const name account = "myaccount"_n;
+     * const name contract = "eosio.token"_n;
+     * const symbol_code symcode = symbol_code{"EOS"};
+     * const name ram_payer = "myaccount";
+     *
+     * walletSx::open_action open( "wallet.sx"_n, { ram_payer, "active"_n });
+     * open.send( account, contract, symcode, ram_payer );
+     * ```
+     */
     [[eosio::action]]
     void open( const name account, const name contract, const symbol_code symcode, const name ram_payer );
 
+    /**
+     * ## ACTION `close`
+     *
+     * Close contract & symbol balance for account
+     *
+     * - **authority**: `account`
+     *
+     * ### params
+     *
+     * - `{name} account` - account to close balance
+     * - `{name} contract` - token contract (ex: "eosio.token")
+     * - `{symbol_code} symcode` - symcode code (ex: "EOS")
+     *
+     * ### Example - cleos
+     *
+     * ```bash
+     * cleos push action wallet.sx close '["myaccount", "eosio.token", "EOS"]' -p myaccount
+     * ```
+     *
+     * ### Example - smart contract
+     *
+     * ```c++
+     * const name account = "myaccount"_n;
+     * const name contract = "eosio.token"_n;
+     * const symbol_code symcode = symbol_code{"EOS"};
+     *
+     * walletSx::close_action close( "wallet.sx"_n, { account, "active"_n });
+     * close.send( account, contract, symcode );
+     * ```
+     */
     [[eosio::action]]
     void close( const name account, const name contract, const symbol_code symcode );
 

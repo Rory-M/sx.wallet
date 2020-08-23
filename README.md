@@ -9,6 +9,7 @@ Deposit/withdraw assets from SX wallet contract
 cleos transfer myaccount wallet.sx "1.0000 EOS"
 
 # deposit to specific account
+cleos push action wallet.sx open '["toaccount", "eosio.token", "EOS", "myaccount"]' -p myaccount
 cleos transfer myaccount wallet.sx "1.0000 EOS" "toaccount"
 
 # withdraw
@@ -23,6 +24,8 @@ cleos push action wallet.sx transfer '["myaccount", "toaccount", "eosio.token", 
 - [TABLE `balances`](#table-balances)
 - [ACTION `withdraw`](#action-withdraw)
 - [ACTION `transfer`](#action-transfer)
+- [ACTION `open`](#action-open)
+- [ACTION `close`](#action-close)
 - [STATIC `get_balance`](#static-get_balance)
 
 ## TABLE `balances`
@@ -113,6 +116,66 @@ const string memo = "my memo";
 // send transaction
 walletSx::transfer_action transfer( "wallet.sx"_n, { from, "active"_n });
 transfer.send( from, to, contract, quantity, memo );
+```
+
+## ACTION `open`
+
+Open contract & symbol balance for account
+
+- **authority**: `ram_payer`
+
+### params
+
+- `{name} account` - account to open balance
+- `{name} contract` - token contract (ex: "eosio.token")
+- `{symbol_code} symcode` - symcode code (ex: "EOS")
+- `{name} ram_payer` - authorized account to pay for RAM
+
+### Example - cleos
+
+```bash
+cleos push action wallet.sx open '["myaccount", "eosio.token", "EOS", "myaccount"]' -p myaccount
+```
+
+### Example - smart contract
+
+```c++
+const name account = "myaccount"_n;
+const name contract = "eosio.token"_n;
+const symbol_code symcode = symbol_code{"EOS"};
+const name ram_payer = "myaccount";
+
+walletSx::open_action open( "wallet.sx"_n, { ram_payer, "active"_n });
+open.send( account, contract, symcode, ram_payer );
+```
+
+## ACTION `close`
+
+Close contract & symbol balance for account
+
+- **authority**: `account`
+
+### params
+
+- `{name} account` - account to close balance
+- `{name} contract` - token contract (ex: "eosio.token")
+- `{symbol_code} symcode` - symcode code (ex: "EOS")
+
+### Example - cleos
+
+```bash
+cleos push action wallet.sx close '["myaccount", "eosio.token", "EOS"]' -p myaccount
+```
+
+### Example - smart contract
+
+```c++
+const name account = "myaccount"_n;
+const name contract = "eosio.token"_n;
+const symbol_code symcode = symbol_code{"EOS"};
+
+walletSx::close_action close( "wallet.sx"_n, { account, "active"_n });
+close.send( account, contract, symcode );
 ```
 
 ## STATIC `get_balance`
