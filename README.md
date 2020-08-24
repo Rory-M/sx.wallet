@@ -15,15 +15,15 @@ cleos transfer myaccount wallet.sx "1.0000 EOS" "toaccount"
 # withdraw
 cleos push action wallet.sx withdraw '["myaccount", "eosio.token", "1.0000 EOS"]' -p myaccount
 
-# transer
-cleos push action wallet.sx transfer '["myaccount", "toaccount", "eosio.token", "1.0000 EOS", "my memo"]' -p myaccount
+# move
+cleos push action wallet.sx move '["myaccount", "toaccount", "eosio.token", "1.0000 EOS", "my memo"]' -p myaccount
 ```
 
 ## Table of Content
 
 - [TABLE `balances`](#table-balances)
 - [ACTION `withdraw`](#action-withdraw)
-- [ACTION `transfer`](#action-transfer)
+- [ACTION `move`](#action-move)
 - [ACTION `open`](#action-open)
 - [ACTION `close`](#action-close)
 - [STATIC `get_balance`](#static-get_balance)
@@ -83,24 +83,24 @@ wallet::withdraw_action withdraw( "wallet.sx"_n, { owner, "active"_n });
 withdraw.send( owner, contract, quantity );
 ```
 
-## ACTION `transfer`
+## ACTION `move`
 
-Transfer assets to an account
+Move assets to an account
 
 - **authority**: `from` or `get_self()`
 
 ### params
 
-- `{name} from` - authorized sender account
+- `{name} from` - authorized sender account & funds to be deducted
 - `{name} to` - receiver account
 - `{name} contract` - token contract (ex: "eosio.token")
 - `{asset} quantity` - transfer quantity amount (ex: "1.0000 EOS")
-- `{string} [memo=""]` - memo used on transfer
+- `{string} [memo=""]` - memo used on move
 
 ### Example - cleos
 
 ```bash
-cleos push action wallet.sx transfer '["myaccount", "toaccount", "eosio.token", "1.0000 EOS", "memo"]' -p myaccount
+cleos push action wallet.sx move '["myaccount", "toaccount", "eosio.token", "1.0000 EOS", "memo"]' -p myaccount
 ```
 
 ### Example - smart contract
@@ -114,8 +114,8 @@ const asset quantity = asset{ 10000, symbol{"EOS", 4} };
 const string memo = "my memo";
 
 // send transaction
-walletSx::transfer_action transfer( "wallet.sx"_n, { from, "active"_n });
-transfer.send( from, to, contract, quantity, memo );
+walletSx::move_action move( "wallet.sx"_n, { from, "active"_n });
+move.send( from, to, contract, quantity, memo );
 ```
 
 ## ACTION `open`

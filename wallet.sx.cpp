@@ -28,11 +28,11 @@ void walletSx::on_transfer( const name from, const name to, const asset quantity
 [[eosio::action]]
 void walletSx::withdraw( const name account, const name contract, const asset quantity )
 {
-    walletSx::transfer( account, account, contract, quantity, "withdraw" );
+    walletSx::move( account, account, contract, quantity, "withdraw" );
 }
 
 [[eosio::action]]
-void walletSx::transfer( const name from, const name to, const name contract, const asset quantity, const optional<string> memo )
+void walletSx::move( const name from, const name to, const name contract, const asset quantity, const optional<string> memo )
 {
     require_auth_or_self( from );
 
@@ -147,6 +147,10 @@ void walletSx::check_open( const name account, const name contract, const symbol
 {
     check( is_account( account ), account.to_string() + " account does not exist");
 
+    // disable checks if authority is self
+    if ( has_auth( get_self() )) return;
+
+    // make sure receiver has open balance
     token::accounts _accounts( contract, account.value );
     auto itr = _accounts.find( symcode.raw() );
     check( itr != _accounts.end(), account.to_string() + " account must have " + symcode.to_string() + " `open` balance in " + contract.to_string());
@@ -156,6 +160,10 @@ void walletSx::check_open_internal( const name account, const name contract, con
 {
     check( is_account( account ), account.to_string() + " account does not exist");
 
+    // disable checks if authority is self
+    if ( has_auth( get_self() )) return;
+
+    // make sure receiver has open balance internally
     walletSx::balances _balances( get_self(), account.value );
     const string message = account.to_string() + " account must have " + symcode.to_string() + " `open` balance in " + get_self().to_string();
     const auto itr = _balances.find( contract.value );

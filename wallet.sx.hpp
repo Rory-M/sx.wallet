@@ -80,24 +80,24 @@ public:
     void withdraw( const name account, const name contract, const asset quantity );
 
     /**
-     * ## ACTION `transfer`
+     * ## ACTION `move`
      *
-     * Transfer assets to an account
+     * Move assets to an account
      *
      * - **authority**: `from` or `get_self()`
      *
      * ### params
      *
-     * - `{name} from` - authorized sender account
+     * - `{name} from` - authorized sender account & funds to be deducted
      * - `{name} to` - receiver account
      * - `{name} contract` - token contract (ex: "eosio.token")
      * - `{asset} quantity` - transfer quantity amount (ex: "1.0000 EOS")
-     * - `{string} [memo=""]` - memo used on transfer
+     * - `{string} [memo=""]` - memo used on move
      *
      * ### Example - cleos
      *
      * ```bash
-     * cleos push action wallet.sx transfer '["myaccount", "toaccount", "eosio.token", "1.0000 EOS", "memo"]' -p myaccount
+     * cleos push action wallet.sx move '["myaccount", "toaccount", "eosio.token", "1.0000 EOS", "memo"]' -p myaccount
      * ```
      *
      * ### Example - smart contract
@@ -111,12 +111,12 @@ public:
      * const string memo = "my memo";
      *
      * // send transaction
-     * walletSx::transfer_action transfer( "wallet.sx"_n, { from, "active"_n });
-     * transfer.send( from, to, contract, quantity, memo );
+     * walletSx::move_action move( "wallet.sx"_n, { from, "active"_n });
+     * move.send( from, to, contract, quantity, memo );
      * ```
      */
     [[eosio::action]]
-    void transfer( const name from, const name to, const name contract, const asset quantity, const optional<string> memo );
+    void move( const name from, const name to, const name contract, const asset quantity, const optional<string> memo );
 
     /**
      * ## ACTION `open`
@@ -227,7 +227,7 @@ public:
 
     // action wrappers
     using withdraw_action = eosio::action_wrapper<"withdraw"_n, &walletSx::withdraw>;
-    using transfer_action = eosio::action_wrapper<"transfer"_n, &walletSx::transfer>;
+    using move_action = eosio::action_wrapper<"move"_n, &walletSx::move>;
     using deposit_action = eosio::action_wrapper<"deposit"_n, &walletSx::deposit>;
     using open_action = eosio::action_wrapper<"open"_n, &walletSx::open>;
     using close_action = eosio::action_wrapper<"close"_n, &walletSx::close>;
