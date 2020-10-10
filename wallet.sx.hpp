@@ -6,7 +6,9 @@ using namespace std;
 
 #include <optional>
 
-class [[eosio::contract("wallet.sx")]] walletSx : public contract {
+namespace sx {
+
+class [[eosio::contract("wallet.sx")]] wallet : public contract {
 
 public:
     using contract::contract;
@@ -72,51 +74,12 @@ public:
      * const asset quantity = asset{ 10000, symbol{"EOS", 4} };
      *
      * // send transaction
-     * walletSx::withdraw_action withdraw( "wallet.sx"_n, { account, "active"_n });
+     * sx::wallet::withdraw_action withdraw( "wallet.sx"_n, { account, "active"_n });
      * withdraw.send( account, contract, quantity );
      * ```
      */
     [[eosio::action]]
     void withdraw( const name account, const name contract, const asset quantity );
-
-    /**
-     * ## ACTION `move`
-     *
-     * Move assets to an account
-     *
-     * - **authority**: `from` or `get_self()`
-     *
-     * ### params
-     *
-     * - `{name} from` - authorized sender account & funds to be deducted
-     * - `{name} to` - receiver account
-     * - `{name} contract` - token contract (ex: "eosio.token")
-     * - `{asset} quantity` - transfer quantity amount (ex: "1.0000 EOS")
-     * - `{string} [memo=""]` - memo used on move
-     *
-     * ### Example - cleos
-     *
-     * ```bash
-     * cleos push action wallet.sx move '["myaccount", "toaccount", "eosio.token", "1.0000 EOS", "memo"]' -p myaccount
-     * ```
-     *
-     * ### Example - smart contract
-     *
-     * ```c++
-     * // input variables
-     * const name from = "myaccount"_n;
-     * const name to = "toaccount"_n;
-     * const name contract = "eosio.token"_n;
-     * const asset quantity = asset{ 10000, symbol{"EOS", 4} };
-     * const string memo = "my memo";
-     *
-     * // send transaction
-     * walletSx::move_action move( "wallet.sx"_n, { from, "active"_n });
-     * move.send( from, to, contract, quantity, memo );
-     * ```
-     */
-    [[eosio::action]]
-    void move( const name from, const name to, const name contract, const asset quantity, const optional<string> memo );
 
     /**
      * ## ACTION `open`
@@ -146,7 +109,7 @@ public:
      * const symbol_code symcode = symbol_code{"EOS"};
      * const name ram_payer = "myaccount";
      *
-     * walletSx::open_action open( "wallet.sx"_n, { ram_payer, "active"_n });
+     * sx::wallet::open_action open( "wallet.sx"_n, { ram_payer, "active"_n });
      * open.send( account, contract, symcode, ram_payer );
      * ```
      */
@@ -179,7 +142,7 @@ public:
      * const name contract = "eosio.token"_n;
      * const symbol_code symcode = symbol_code{"EOS"};
      *
-     * walletSx::close_action close( "wallet.sx"_n, { account, "active"_n });
+     * sx::wallet::close_action close( "wallet.sx"_n, { account, "active"_n });
      * close.send( account, contract, symcode );
      * ```
      */
@@ -211,13 +174,13 @@ public:
      * const name contract = "eosio.token"_n;
      * const symbol_code symcode = symbol_code{"EOS"};
      *
-     * const asset balance = walletSx::get_balance( "wallet.sx"_n, account, contract, symcode );
+     * const asset balance = sx::wallet::get_balance( "wallet.sx"_n, account, contract, symcode );
      * //=> "1.0000 EOS"
      * ```
      */
     static asset get_balance( const name code, const name account, const name contract, const symbol_code symcode )
     {
-        walletSx::balances _balances( code, account.value );
+        sx::wallet::balances _balances( code, account.value );
         const auto balances = _balances.get( contract.value, "no account balance found" ).balances;
         const asset balance = balances.at( symcode );
         check( balance.symbol.code().raw(), "no balance found" );
@@ -226,11 +189,10 @@ public:
     }
 
     // action wrappers
-    using withdraw_action = eosio::action_wrapper<"withdraw"_n, &walletSx::withdraw>;
-    using move_action = eosio::action_wrapper<"move"_n, &walletSx::move>;
-    using deposit_action = eosio::action_wrapper<"deposit"_n, &walletSx::deposit>;
-    using open_action = eosio::action_wrapper<"open"_n, &walletSx::open>;
-    using close_action = eosio::action_wrapper<"close"_n, &walletSx::close>;
+    using withdraw_action = eosio::action_wrapper<"withdraw"_n, &sx::wallet::withdraw>;
+    using deposit_action = eosio::action_wrapper<"deposit"_n, &sx::wallet::deposit>;
+    using open_action = eosio::action_wrapper<"open"_n, &sx::wallet::open>;
+    using close_action = eosio::action_wrapper<"close"_n, &sx::wallet::close>;
 
 private:
     void add_balance( const name account, const name contract, const asset quantity, const name ram_payer );
@@ -239,3 +201,5 @@ private:
     void check_open_internal( const name account, const name contract, const symbol_code symcode );
     void require_auth_or_self( const name account );
 };
+
+}

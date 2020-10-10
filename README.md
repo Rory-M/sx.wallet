@@ -14,16 +14,12 @@ cleos transfer myaccount wallet.sx "1.0000 EOS" "toaccount"
 
 # withdraw
 cleos push action wallet.sx withdraw '["myaccount", "eosio.token", "1.0000 EOS"]' -p myaccount
-
-# move
-cleos push action wallet.sx move '["myaccount", "toaccount", "eosio.token", "1.0000 EOS", "my memo"]' -p myaccount
 ```
 
 ## Table of Content
 
 - [TABLE `balances`](#table-balances)
 - [ACTION `withdraw`](#action-withdraw)
-- [ACTION `move`](#action-move)
 - [ACTION `open`](#action-open)
 - [ACTION `close`](#action-close)
 - [STATIC `get_balance`](#static-get_balance)
@@ -81,26 +77,6 @@ const asset quantity = asset{ 10000, symbol{"EOS", 4} };
 // send transaction
 wallet::withdraw_action withdraw( "wallet.sx"_n, { owner, "active"_n });
 withdraw.send( owner, contract, quantity );
-```
-
-## ACTION `move`
-
-Move assets to an account
-
-- **authority**: `from` or `get_self()`
-
-### params
-
-- `{name} from` - authorized sender account & funds to be deducted
-- `{name} to` - receiver account
-- `{name} contract` - token contract (ex: "eosio.token")
-- `{asset} quantity` - transfer quantity amount (ex: "1.0000 EOS")
-- `{string} [memo=""]` - memo used on move
-
-### Example - cleos
-
-```bash
-cleos push action wallet.sx move '["myaccount", "toaccount", "eosio.token", "1.0000 EOS", "memo"]' -p myaccount
 ```
 
 ### Example - smart contract
